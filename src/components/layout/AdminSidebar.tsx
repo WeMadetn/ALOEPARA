@@ -28,6 +28,7 @@ const navigationItems = [
   { title: "Commandes", url: "/orders", icon: ShoppingCart },
   { title: "Clients", url: "/customers", icon: Users },
   { title: "Paramètres", url: "/settings", icon: Settings },
+  { title: "NewsLetters", url: "/settings", icon: Settings },
 ];
 
 export function AdminSidebar() {
