@@ -1,0 +1,103 @@
+<section class="products-section py-5 bg-light-custom">
+  <div class="container-fluid">
+    <!-- Section Header -->
+    <div class="row mb-5">
+      <div class="col-12 text-center">
+        <h2 class="section-title text-primary mb-3">Produits Populaires</h2>
+        <p class="section-subtitle text-muted">
+          Découvrez nos produits les plus appréciés par nos clients
+        </p>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="row g-4">
+      <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12" 
+           *ngFor="let product of products; trackBy: trackByProduct">
+        <div class="product-card" [class.out-of-stock]="!product.inStock">
+          
+          <!-- Product Image -->
+          <div class="product-image">
+            <img [src]="product.imageUrl"
+                 [alt]="product.name"
+                 class="product-img"
+                 loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+            <div class="product-placeholder" style="display: none;">
+              <i class="fas fa-image"></i>
+            </div>
+            
+            <!-- Promotion Badge -->
+            <div class="promotion-badge" *ngIf="product.isPromotion">
+              -{{ product.promotionPercentage }}%
+            </div>
+            
+            <!-- Out of Stock Badge -->
+            <div class="stock-badge" *ngIf="!product.inStock">
+              Rupture de stock
+            </div>
+            
+            <!-- Product Actions -->
+            <div class="product-actions">
+              <button class="action-btn wishlist-btn" 
+                      (click)="onAddToWishlist(product)"
+                      [attr.aria-label]="'Ajouter ' + product.name + ' aux favoris'">
+                <i class="fas fa-heart"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Content -->
+          <div class="product-content">
+            <!-- Brand -->
+            <div class="product-brand" *ngIf="product.brand">
+              {{ product.brand }}
+            </div>
+            
+            <!-- Name -->
+            <h3 class="product-name">{{ product.name }}</h3>
+            
+            <!-- Description -->
+            <p class="product-description">{{ product.description }}</p>
+            
+            <!-- Rating -->
+            <div class="product-rating" *ngIf="product.rating">
+              <div class="stars">
+                <i class="fas fa-star" 
+                   *ngFor="let star of getStarArray(product.rating)"
+                   [class.filled]="star"></i>
+              </div>
+              <span class="rating-text">({{ product.reviewCount }})</span>
+            </div>
+            
+            <!-- Price -->
+            <div class="product-price">
+              <span class="current-price">{{ product.price | number:'1.3-3' }} TND</span>
+              <span class="original-price" *ngIf="product.originalPrice">
+                {{ product.originalPrice | number:'1.3-3' }} TND
+              </span>
+            </div>
+            
+            <!-- Add to Cart Button -->
+            <button class="btn btn-primary add-to-cart-btn w-100" 
+                    (click)="onAddToCart(product)"
+                    [disabled]="!product.inStock">
+              <i class="fas fa-shopping-cart me-2"></i>
+              {{ product.inStock ? 'Ajouter au panier' : 'Indisponible' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View All Button -->
+    <div class="row mt-5">
+      <div class="col-12 text-center">
+        <a href="#" class="btn btn-outline-primary btn-lg">
+          <i class="fas fa-th me-2"></i>
+          Voir tous les produits
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

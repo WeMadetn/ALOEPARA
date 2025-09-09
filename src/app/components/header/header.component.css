@@ -1,0 +1,190 @@
+/* Header Styles */
+.top-bar {
+  font-size: 0.875rem;
+}
+
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  cursor: pointer;
+}
+
+.logo img {
+  transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+  transform: scale(1.05);
+}
+
+.logo-text {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-decoration: none;
+  letter-spacing: -0.5px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: color 0.3s ease;
+}
+
+.logo:hover .logo-text {
+  color: var(--secondary-color);
+}
+
+/* Search Bar */
+.search-input {
+  border: 2px solid var(--border-color);
+  border-right: none;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+}
+
+.search-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: none;
+}
+
+.search-btn {
+  border: 2px solid var(--primary-color);
+  border-left: none;
+  padding: 12px 20px;
+}
+
+/* User Actions */
+.action-item a {
+  transition: color 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.action-item a:hover {
+  color: var(--primary-color) !important;
+}
+
+.badge {
+  font-size: 0.7rem;
+  padding: 0.25em 0.5em;
+}
+
+.bg-accent {
+  background-color: var(--accent-color) !important;
+}
+
+/* Navigation */
+.main-navigation {
+  border-top: 1px solid var(--border-color);
+}
+
+.nav-link {
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  margin: 0 2px;
+}
+
+.nav-link:hover {
+  background-color: var(--primary-color);
+  color: white !important;
+  transform: translateY(-2px);
+}
+
+.nav-link i {
+  font-size: 0.8rem;
+}
+
+/* Mobile Menu */
+.mobile-navigation {
+  position: relative;
+}
+
+.mobile-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.mobile-menu-body a {
+  transition: background-color 0.3s ease;
+}
+
+.mobile-menu-body a:hover {
+  background-color: var(--background-light);
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle button {
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.mobile-menu-toggle button:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .top-bar {
+    font-size: 0.75rem;
+  }
+  
+  .top-bar .col-md-4 {
+    display: none;
+  }
+  
+  .main-header .py-3 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+  
+  .action-item {
+    font-size: 0.8rem;
+  }
+
+  .logo-text {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .logo img {
+    max-height: 40px !important;
+  }
+
+  .logo-text {
+    font-size: 1.4rem;
+  }
+  
+  .search-input {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .search-btn {
+    padding: 10px 16px;
+  }
+}
+
+/* Animation for mobile menu */
+.mobile-navigation.show .mobile-menu {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
