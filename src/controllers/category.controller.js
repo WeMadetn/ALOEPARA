@@ -4,7 +4,7 @@ import slugify from "slugify";
 // Créer une catégorie ou sous-catégorie
 export const createCategory = async (req, res) => {
   try {
-    const { name, parent } = req.body; // parent optionnel
+    const { name, parent } = req.body; 
     const category = new Category({
       name,
       parent: parent || null,
