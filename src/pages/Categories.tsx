@@ -1,17 +1,52 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2, ChevronRight, ChevronDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CategoryModal } from "@/components/modals/CategoryModal";
-import { mockCategories, type Category } from "@/data/mockData";
+import { getCategories, createCategory, updateCategory, deleteCategory } from "../services/categoryService";
+import { Category } from "../data/mockData";
 
 export default function Categories() {
-  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  const queryClient = useQueryClient();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedParent, setSelectedParent] = useState<string | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
+  
+  const { data: categories, isLoading, isError, error } = useQuery<Category[]>({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+  });
+
+ 
+  const createMutation = useMutation({
+    mutationFn: createCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      setIsModalOpen(false);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, category }: { id: string; category: Category }) =>
+      updateCategory(id, category),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      setIsModalOpen(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+
+  
   const handleAddCategory = (parentId?: string) => {
     setSelectedCategory(null);
     setSelectedParent(parentId || null);
@@ -24,73 +59,22 @@ export default function Categories() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteCategory = (categoryId: string) => {
-    const deleteRecursive = (cats: Category[]): Category[] => {
-      return cats.filter(cat => {
-        if (cat.id === categoryId) return false;
-        if (cat.children) {
-          cat.children = deleteRecursive(cat.children);
-        }
-        return true;
-      });
-    };
-    setCategories(deleteRecursive(categories));
+  const handleDeleteCategory = (id: string) => {
+    deleteMutation.mutate(id);
   };
 
   const handleSaveCategory = (categoryData: Omit<Category, "id" | "children">) => {
     if (selectedCategory) {
-      // Édition
-      const updateRecursive = (cats: Category[]): Category[] => {
-        return cats.map(cat => {
-          if (cat.id === selectedCategory.id) {
-            return { ...cat, ...categoryData };
-          }
-          if (cat.children) {
-            cat.children = updateRecursive(cat.children);
-          }
-          return cat;
-        });
-      };
-      setCategories(updateRecursive(categories));
+      updateMutation.mutate({ id: selectedCategory.id, category: { ...selectedCategory, ...categoryData } });
     } else {
-      // Ajout
-      const newCategory: Category = {
-        ...categoryData,
-        id: Date.now().toString(),
-      };
-
-      if (selectedParent) {
-        // Ajouter comme sous-catégorie
-        const addToParent = (cats: Category[]): Category[] => {
-          return cats.map(cat => {
-            if (cat.id === selectedParent) {
-              return {
-                ...cat,
-                children: [...(cat.children || []), newCategory]
-              };
-            }
-            if (cat.children) {
-              cat.children = addToParent(cat.children);
-            }
-            return cat;
-          });
-        };
-        setCategories(addToParent(categories));
-      } else {
-        // Ajouter comme catégorie principale
-        setCategories([...categories, newCategory]);
-      }
+      createMutation.mutate({ ...categoryData, parentId: selectedParent || undefined } as Category);
     }
-    setIsModalOpen(false);
   };
 
   const toggleExpanded = (categoryId: string) => {
     const newExpanded = new Set(expandedCategories);
-    if (newExpanded.has(categoryId)) {
-      newExpanded.delete(categoryId);
-    } else {
-      newExpanded.add(categoryId);
-    }
+    if (newExpanded.has(categoryId)) newExpanded.delete(categoryId);
+    else newExpanded.add(categoryId);
     setExpandedCategories(newExpanded);
   };
 
@@ -100,9 +84,9 @@ export default function Categories() {
 
     return (
       <div key={category.id} className="space-y-2">
-        <div 
+        <div
           className={`flex items-center justify-between p-4 bg-card rounded-lg border hover:shadow-soft transition-shadow ${
-            level > 0 ? 'ml-8 bg-accent/20' : ''
+            level > 0 ? "ml-8 bg-accent/20" : ""
           }`}
         >
           <div className="flex items-center space-x-3">
@@ -113,36 +97,19 @@ export default function Categories() {
                 className="w-6 h-6"
                 onClick={() => toggleExpanded(category.id)}
               >
-                {isExpanded ? (
-                  <ChevronDown className="w-4 h-4" />
-                ) : (
-                  <ChevronRight className="w-4 h-4" />
-                )}
+                {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
               </Button>
             ) : (
               <div className="w-6 h-6" />
             )}
-            <div>
-              <h3 className="font-medium text-foreground">{category.name}</h3>
-              {category.description && (
-                <p className="text-sm text-muted-foreground">{category.description}</p>
-              )}
-            </div>
+           
           </div>
           <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleAddCategory(category.id)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => handleAddCategory(category.id)}>
               <Plus className="w-4 h-4 mr-1" />
               Sous-catégorie
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleEditCategory(category)}
-            >
+            <Button variant="ghost" size="icon" onClick={() => handleEditCategory(category)}>
               <Edit className="w-4 h-4" />
             </Button>
             <Button
@@ -150,29 +117,30 @@ export default function Categories() {
               size="icon"
               onClick={() => handleDeleteCategory(category.id)}
               className="text-destructive hover:text-destructive"
+              disabled={deleteMutation.isPending}
             >
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
         </div>
-        
+
         {hasChildren && isExpanded && (
-          <div>
-            {category.children!.map(child => renderCategory(child, level + 1))}
-          </div>
+          <div>{category.children!.map((child) => renderCategory(child, level + 1))}</div>
         )}
       </div>
     );
   };
+
+  
+  if (isLoading) return <p className="text-center text-muted-foreground">Chargement des catégories...</p>;
+  if (isError) return <p className="text-center text-destructive">Erreur : {(error as Error).message}</p>;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Catégories</h1>
-          <p className="text-muted-foreground mt-2">
-            Organisez vos produits par catégories et sous-catégories
-          </p>
+          <p className="text-muted-foreground mt-2">Organisez vos produits par catégories et sous-catégories</p>
         </div>
         <Button onClick={() => handleAddCategory()} className="bg-primary hover:bg-primary-hover">
           <Plus className="w-4 h-4 mr-2" />
@@ -185,7 +153,11 @@ export default function Categories() {
           <CardTitle>Arbre des catégories</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {categories.map(category => renderCategory(category))}
+          {categories && categories.length > 0 ? (
+            categories.map((category) => renderCategory(category))
+          ) : (
+            <p className="text-muted-foreground text-center">Aucune catégorie trouvée</p>
+          )}
         </CardContent>
       </Card>
 
@@ -195,7 +167,8 @@ export default function Categories() {
         onSave={handleSaveCategory}
         category={selectedCategory}
         parentId={selectedParent}
-        categories={categories}
+        categories={categories || []}
+        
       />
     </div>
   );

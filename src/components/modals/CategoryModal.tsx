@@ -23,7 +23,6 @@ interface CategoryModalProps {
 export function CategoryModal({ isOpen, onClose, onSave, category, parentId, categories }: CategoryModalProps) {
   const [formData, setFormData] = useState({
     name: "",
-    description: "",
     parentId: parentId || undefined,
   });
 
@@ -43,13 +42,11 @@ export function CategoryModal({ isOpen, onClose, onSave, category, parentId, cat
     if (category) {
       setFormData({
         name: category.name,
-        description: category.description || "",
         parentId: category.parentId,
       });
     } else {
       setFormData({
         name: "",
-        description: "",
         parentId: parentId || undefined,
       });
     }
@@ -95,18 +92,6 @@ export function CategoryModal({ isOpen, onClose, onSave, category, parentId, cat
               required
             />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={handleInputChange('description')}
-              rows={3}
-              placeholder="Description de la catégorie (optionnel)"
-            />
-          </div>
-
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Annuler

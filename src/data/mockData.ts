@@ -1,7 +1,6 @@
 export interface Category {
   id: string;
   name: string;
-  description?: string;
   parentId?: string;
   children?: Category[];
 }
@@ -43,7 +42,6 @@ export const mockCategories: Category[] = [
   {
     id: '1',
     name: 'Visage',
-    description: 'Produits pour le soin du visage',
     children: [
       { id: '1-1', name: 'Yeux', parentId: '1' },
       { id: '1-2', name: 'Lèvres', parentId: '1' },
@@ -53,7 +51,6 @@ export const mockCategories: Category[] = [
   {
     id: '2',
     name: 'Corps',
-    description: 'Produits pour le soin du corps',
     children: [
       { id: '2-1', name: 'Gels douche', parentId: '2' },
       { id: '2-2', name: 'Crèmes corps', parentId: '2' },
@@ -63,7 +60,6 @@ export const mockCategories: Category[] = [
   {
     id: '3',
     name: 'Cheveux',
-    description: 'Produits capillaires',
     children: [
       { id: '3-1', name: 'Shampoings', parentId: '3' },
       { id: '3-2', name: 'Après-shampoings', parentId: '3' },
@@ -73,7 +69,6 @@ export const mockCategories: Category[] = [
   {
     id: '4',
     name: 'Santé',
-    description: 'Produits de santé et bien-être',
     children: [
       { id: '4-1', name: 'Vitamines', parentId: '4' },
       { id: '4-2', name: 'Premiers secours', parentId: '4' },
