@@ -10,20 +10,23 @@ export interface Category {
   createdAt?: string;
   updatedAt?: string;
   parent?: string;
+  products?: Product[];
   subCategories?: Category[];
 }
 
 export interface Product {
-  id: string;
+  _id?: string;
   name: string;
   description: string;
-  price: number;
+  brand?: string;
+  price?: number;
+  promotionPrice?: number;
   stock: number;
-  categoryId: string;
-  sku: string;
-  image?: string;
-  status: 'active' | 'inactive';
-  createdAt: string;
+  category?: string | Category;
+  images?: string[] | File[];
+  isPromotion?: boolean;
+  statusProduct: 'active' | 'inactive';
+  createdAt?: string;
 }
 
 export interface Order {
@@ -87,58 +90,58 @@ export const mockCategories: Category[] = [
 
 export const mockProducts: Product[] = [
   {
-    id: '1',
+    _id: '1',
     name: 'Crème Anti-âge Yeux',
     description: 'Crème contour des yeux anti-rides et anti-cernes',
     price: 29.99,
     stock: 150,
-    categoryId: '1-1',
-    sku: 'CREAM-EYE-001',
-    status: 'active',
+    category: '1-1',
+   
+    statusProduct: 'active',
     createdAt: '2024-01-15T10:00:00Z'
   },
   {
-    id: '2',
+    _id: '2',
     name: 'Rouge à Lèvres Hydratant',
     description: 'Rouge à lèvres longue tenue avec actifs hydratants',
     price: 19.99,
     stock: 85,
-    categoryId: '1-2',
-    sku: 'LIPS-RED-002',
-    status: 'active',
+    category: '1-2',
+    
+    statusProduct: 'active',
     createdAt: '2024-01-16T14:30:00Z'
   },
   {
-    id: '3',
+    _id: '3',
     name: 'Crème Hydratante Jour',
     description: 'Crème hydratante quotidienne SPF 15',
     price: 24.99,
     stock: 200,
-    categoryId: '1-3',
-    sku: 'CREAM-DAY-003',
-    status: 'active',
+    category: '1-3',
+   
+    statusProduct: 'active',
     createdAt: '2024-01-17T09:15:00Z'
   },
   {
-    id: '4',
+    _id: '4',
     name: 'Gel Douche Surgras',
     description: 'Gel douche pour peaux sensibles',
     price: 8.99,
     stock: 300,
-    categoryId: '2-1',
-    sku: 'SHOWER-SENS-004',
-    status: 'active',
+    category: '2-1',
+    
+    statusProduct: 'active',
     createdAt: '2024-01-18T11:45:00Z'
   },
   {
-    id: '5',
+    _id: '5',
     name: 'Shampoing Réparateur',
     description: 'Shampoing pour cheveux abîmés et secs',
     price: 12.99,
     stock: 120,
-    categoryId: '3-1',
-    sku: 'SHAM-REP-005',
-    status: 'active',
+    category: '3-1',
+    
+    statusProduct: 'active',
     createdAt: '2024-01-19T16:20:00Z'
   }
 ];

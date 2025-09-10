@@ -21,32 +21,43 @@ import { type Product, type Category } from "@/data/mockData";
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (product: Omit<Product, "id" | "createdAt">) => void;
+  onSave: (product: Omit<Product, "_id" | "createdAt">) => void;
   product: Product | null;
   categories: Category[];
 }
 
-export function ProductModal({ isOpen, onClose, onSave, product, categories }: ProductModalProps) {
-  const [formData, setFormData] = useState({
+export function ProductModal({
+  isOpen,
+  onClose,
+  onSave,
+  product,
+  categories,
+}: ProductModalProps) {
+  const [formData, setFormData] = useState<Omit<Product, "_id" | "createdAt">>({
     name: "",
     description: "",
+    brand: "",
     price: 0,
     stock: 0,
-    categoryId: "",
-    sku: "",
-    status: "active" as "active" | "inactive",
+    category: "",
+    statusProduct: "active",
+    images: [],
   });
 
-  // Aplatir les catégories pour inclure les sous-catégories
-  const flattenCategories = (cats: Category[], prefix = ""): Array<{id: string, name: string}> => {
-    const result: Array<{id: string, name: string}> = [];
-    cats.forEach(cat => {
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  // Fonction pour aplatir les catégories et sous-catégories
+  const flattenCategories = (
+    cats: Category[],
+    prefix = ""
+  ): Array<{ id: string; name: string }> => {
+    const result: Array<{ id: string; name: string }> = [];
+    cats.forEach((cat) => {
       const displayName = prefix ? `${prefix} > ${cat.name}` : cat.name;
+
       if (cat.subCategories && cat.subCategories.length > 0) {
-        // Ajouter les sous-catégories seulement
         result.push(...flattenCategories(cat.subCategories, displayName));
-      } else if (prefix) {
-        // C'est une sous-catégorie (a un prefix)
+      } else {
         result.push({ id: cat._id, name: displayName });
       }
     });
@@ -60,34 +71,52 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
       setFormData({
         name: product.name,
         description: product.description,
+        brand: product.brand || "",
         price: product.price,
         stock: product.stock,
-        categoryId: product.categoryId,
-        sku: product.sku,
-        status: product.status,
+        category: product.category,
+        statusProduct: product.statusProduct,
+        images: product.images || [],
       });
+      setSelectedFiles([]);
     } else {
       setFormData({
         name: "",
         description: "",
+        brand: "",
         price: 0,
         stock: 0,
-        categoryId: "",
-        sku: "",
-        status: "active",
+        category: "",
+        statusProduct: "active",
+        images: [],
       });
+      setSelectedFiles([]);
     }
   }, [product, isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const files = Array.from(e.target.files).slice(0, 4); // max 4 fichiers
+    setSelectedFiles(files);
   };
 
-  const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const value = field === 'price' || field === 'stock' ? parseFloat(e.target.value) || 0 : e.target.value;
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave({
+      ...formData,
+      images: selectedFiles.length ? selectedFiles : formData.images,
+    });
   };
+
+  const handleInputChange =
+    (field: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const value =
+        field === "price" || field === "stock"
+          ? parseFloat(e.target.value) || 0
+          : e.target.value;
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -98,47 +127,50 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Nom + Marque */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Nom du produit *</Label>
               <Input
                 id="name"
                 value={formData.name}
-                onChange={handleInputChange('name')}
+                onChange={handleInputChange("name")}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="sku">SKU *</Label>
+              <Label htmlFor="brand">Marque</Label>
               <Input
-                id="sku"
-                value={formData.sku}
-                onChange={handleInputChange('sku')}
-                required
+                id="brand"
+                value={formData.brand || ""}
+                onChange={handleInputChange("brand")}
+                placeholder="Ex: Nivea"
               />
             </div>
           </div>
 
+          {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
               value={formData.description}
-              onChange={handleInputChange('description')}
-              rows={3}
+              onChange={handleInputChange("description")}
+              rows={2}
             />
           </div>
 
+          {/* Prix + Stock */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="price">Prix (€) *</Label>
+              <Label htmlFor="price">Prix (dt) *</Label>
               <Input
                 id="price"
                 type="number"
-                step="0.01"
+                step="0.1"
                 min="0"
                 value={formData.price}
-                onChange={handleInputChange('price')}
+                onChange={handleInputChange("price")}
                 required
               />
             </div>
@@ -149,42 +181,78 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
                 type="number"
                 min="0"
                 value={formData.stock}
-                onChange={handleInputChange('stock')}
+                onChange={handleInputChange("stock")}
                 required
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Catégorie *</Label>
-              <Select value={formData.categoryId} onValueChange={(value) => setFormData(prev => ({ ...prev, categoryId: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une catégorie" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableCategories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Statut</Label>
-              <Select value={formData.status} onValueChange={(value: "active" | "inactive") => setFormData(prev => ({ ...prev, status: value }))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Actif</SelectItem>
-                  <SelectItem value="inactive">Inactif</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          {/* Catégorie */}
+          {!product && <div className="space-y-2">
+            <Label>Catégorie *</Label>
+            <Select
+              value={formData.category as string}
+              onValueChange={(value) =>
+                setFormData((prev) => ({ ...prev, category: value }))
+              }
+             
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner une catégorie" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableCategories.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>}
+
+          {/* Statut */}
+          <div className="space-y-2">
+            <Label>Statut</Label>
+            <Select
+              value={formData.statusProduct}
+              onValueChange={(value: "active" | "inactive") =>
+                setFormData((prev) => ({ ...prev, statusProduct: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Actif</SelectItem>
+                <SelectItem value="inactive">Inactif</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
+          {/* Upload Images */}
+          {!product && (
+            <div className="space-y-2">
+              <Label>Images (max 4)</Label>
+              <Input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+              <div className="flex space-x-2 mt-2">
+                {formData.images.map((img, i) => (
+                  <img
+                    key={i}
+                    src={typeof img === "string" ? img : URL.createObjectURL(img)}
+                    alt="preview"
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Actions */}
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Annuler

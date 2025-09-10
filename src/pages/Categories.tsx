@@ -20,7 +20,7 @@ export default function Categories() {
   const [selectedParent, setSelectedParent] = useState<string | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
-  
+
   const {
     data: categories,
     isLoading,
@@ -31,7 +31,7 @@ export default function Categories() {
     queryFn: getCategories,
   });
 
-  
+
   const createMutation = useMutation({
     mutationFn: (newCategory: CategoryReq) => createCategory(newCategory),
     onSuccess: () => {
@@ -40,7 +40,7 @@ export default function Categories() {
     },
   });
 
- 
+
   const updateMutation = useMutation({
     mutationFn: ({ id, category }: { id: string; category: CategoryReq }) =>
       updateCategory(id, category),
@@ -50,7 +50,7 @@ export default function Categories() {
     },
   });
 
- 
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteCategory(id),
     onSuccess: () => {
@@ -101,9 +101,8 @@ export default function Categories() {
     return (
       <div key={category._id} className="space-y-2">
         <div
-          className={`flex items-center justify-between p-4 bg-card rounded-lg border hover:shadow-soft transition-shadow ${
-            level > 0 ? "ml-8 bg-accent/20" : ""
-          }`}
+          className={`flex items-center justify-between p-4 bg-card rounded-lg border hover:shadow-soft transition-shadow ${level > 0 ? "ml-8 bg-accent/20" : ""
+            }`}
         >
           <div className="flex items-center space-x-3">
             {hasChildren ? (
@@ -128,14 +127,17 @@ export default function Categories() {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleAddCategory(category._id)}
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              Sous-catégorie
-            </Button>
+            {/* Afficher le bouton seulement si level < 1 (donc parent ou enfant direct) */}
+            {level < 1 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleAddCategory(category._id)}
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Sous-catégorie
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -153,6 +155,7 @@ export default function Categories() {
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
+
         </div>
 
         {hasChildren && isExpanded && (

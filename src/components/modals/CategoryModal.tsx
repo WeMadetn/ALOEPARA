@@ -23,7 +23,7 @@ interface CategoryModalProps {
 export function CategoryModal({ isOpen, onClose, onSave, category, parentId, categories }: CategoryModalProps) {
   const [formData, setFormData] = useState({
     name: "",
-    parentId: parentId || undefined,
+    parent: parentId || undefined,
   });
 
   const getParentName = (id: string): string => {
@@ -42,15 +42,15 @@ export function CategoryModal({ isOpen, onClose, onSave, category, parentId, cat
     if (category) {
       setFormData({
         name: category.name,
-        parentId: category.parent,
+        parent: category.parent,
       });
     } else {
       setFormData({
         name: "",
-        parentId: parentId || undefined,
+        parent: parentId || undefined,
       });
     }
-  }, [category, parentId, isOpen]);
+  }, [category, parent, isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
