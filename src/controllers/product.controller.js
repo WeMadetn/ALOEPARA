@@ -1,10 +1,10 @@
 import Product from "../models/Product.js";
 import Category from "../models/Category.js";
-
+import slugify from "slugify";
 // Créer un produit avec plusieurs images
 export const createProduct = async (req, res) => {
   try {
-    const { name, description, price, stock, category } = req.body;
+    const { name, description, price, brand, stock, statusProduct, category } = req.body;
 
     // Vérifier que la catégorie existe
     if (category) {
@@ -24,11 +24,12 @@ export const createProduct = async (req, res) => {
       description,
       price,
       stock,
+      slug: slugify(name, { lower: true, strict: true }),
       images: imageUrls,
       brand,
-      isPromotion,
+      isPromotion: false,
       statusProduct,
-      promotionPrice,
+      promotionPrice: 0,
       category,
     });
 

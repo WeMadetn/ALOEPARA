@@ -18,6 +18,6 @@ router.get("/", getOrders);
 router.get("/:id", getOrderById);
 
 // Modifier le statut d'une commande
-router.patch("/:id", updateOrderStatus);
+router.put("/:id", updateOrderStatus);
 
 export default router;

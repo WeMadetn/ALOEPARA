@@ -20,7 +20,7 @@ router.get("/", getProducts);
 router.get("/:id", getProductById);
 
 // Modifier un produit
-router.patch("/:id", updateProduct);
+router.put("/:id", updateProduct);
 
 // Supprimer un produit
 router.delete("/:id", deleteProduct);
