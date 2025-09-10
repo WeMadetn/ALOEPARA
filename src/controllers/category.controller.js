@@ -1,5 +1,6 @@
 import Category from "../models/Category.js";
 import slugify from "slugify";
+import Product from "../models/Product.js";
 
 // Créer une catégorie ou sous-catégorie
 export const createCategory = async (req, res) => {
@@ -27,6 +28,52 @@ export const getCategories = async (req, res) => {
       const subCategories = await Category.find({ parent: cat._id });
       result.push({ ...cat.toObject(), subCategories });
     }
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getCategoriesWithProducts = async (req, res) => {
+  try {
+    // Catégories principales
+    const mainCategories = await Category.find({ parent: null }).lean();
+
+    // Sous-catégories
+    const allSubCategories = await Category.find({
+      parent: { $ne: null },
+    }).lean();
+
+    // Tous les produits
+    const allCategoryIds = await Category.find().distinct("_id");
+    const products = await Product.find({
+      category: { $in: allCategoryIds },
+    }).lean();
+
+    // Construire la hiérarchie
+    const result = mainCategories.map((cat) => {
+      // produits de la catégorie principale
+      const catProducts = products.filter(
+        (p) => p.category.toString() === cat._id.toString()
+      );
+
+      // sous-catégories liées à cette catégorie
+      const subCategories = allSubCategories
+        .filter((sub) => sub.parent.toString() === cat._id.toString())
+        .map((sub) => {
+          const subProducts = products.filter(
+            (p) => p.category.toString() === sub._id.toString()
+          );
+          return { ...sub, products: subProducts };
+        });
+
+      return {
+        ...cat,
+        products: catProducts,
+        subCategories,
+      };
+    });
 
     res.json(result);
   } catch (error) {
