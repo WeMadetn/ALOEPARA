@@ -15,7 +15,7 @@ router.post("/", createCategory);
 router.get("/", getCategories);
 
 // Modifier une catégorie ou sous-catégorie
-router.patch("/:id", updateCategory);
+router.put("/:id", updateCategory);
 
 // Supprimer une catégorie et ses sous-catégories
 router.delete("/:id", deleteCategory);
