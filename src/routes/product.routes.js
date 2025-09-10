@@ -6,11 +6,12 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controllers/product.controller.js";
+import { upload } from "../middleware/uploads.js";
 
 const router = express.Router();
 
 // Créer un produit
-router.post("/", createProduct);
+router.post("/", upload.array("images", 5), createProduct);
 
 // Lister tous les produits (option filtre par catégorie ou sous-catégorie via slug)
 router.get("/", getProducts);

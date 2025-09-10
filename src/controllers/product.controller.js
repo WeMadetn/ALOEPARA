@@ -1,22 +1,46 @@
 import Product from "../models/Product.js";
 import Category from "../models/Category.js";
 
-// Créer un produit
+// Créer un produit avec plusieurs images
 export const createProduct = async (req, res) => {
   try {
-    const { name, description, price, stock, image, category } = req.body;
+    const { name, description, price, stock, category } = req.body;
+
+    // Vérifier que la catégorie existe
+    if (category) {
+      const catExists = await Category.findById(category);
+      if (!catExists) {
+        return res.status(400).json({ message: "Catégorie non trouvée" });
+      }
+    }
+
+    // Récupérer les URLs des fichiers uploadés
+    const imageUrls = req.files
+      ? req.files.map((file) => `/uploads/${file.filename}`)
+      : [];
+
     const product = new Product({
       name,
       description,
       price,
       stock,
-      image,
+      images: imageUrls,
+      brand,
+      isPromotion,
+      statusProduct,
+      promotionPrice,
       category,
     });
+
     await product.save();
     res.status(201).json({ message: "Produit créé", product });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res
+      .status(400)
+      .json({
+        error: error.message,
+        message: "Erreur lors de la création du produit",
+      });
   }
 };
 
@@ -26,7 +50,7 @@ export const getProducts = async (req, res) => {
     const filter = {};
 
     if (req.query.category) {
-      // Filtrer par catégorie principale ou sous-catégorie
+      // Filtrer par slug de catégorie
       const category = await Category.findOne({ slug: req.query.category });
       if (category) {
         filter.category = category._id;
@@ -36,7 +60,12 @@ export const getProducts = async (req, res) => {
     const products = await Product.find(filter).populate("category");
     res.json(products);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res
+      .status(500)
+      .json({
+        error: error.message,
+        message: "Erreur lors de la récupération des produits",
+      });
   }
 };
 
@@ -52,7 +81,8 @@ export const getProductById = async (req, res) => {
   }
 };
 
-// Modifier un produit
+// Modifier un produit (texte, prix, stock, catégorie)
+// Pour les images, il faut gérer séparément l’upload ou le remplacement
 export const updateProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, {

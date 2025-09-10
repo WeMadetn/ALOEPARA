@@ -7,7 +7,17 @@ const productSchema = new mongoose.Schema(
     description: { type: String },
     price: { type: Number, required: true },
     stock: { type: Number, default: 0 },
-    images: [{ type: String }], 
+
+    images: [{ type: String }], // image URLs
+    brand: { type: String },
+    isPromotion: { type: Boolean, default: false },
+    // inStock: { type: Boolean, default: true },
+    statusProduct: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
+    promotionPrice: { type: Number },
     category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
   },
   { timestamps: true }
