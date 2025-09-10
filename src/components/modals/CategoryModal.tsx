@@ -28,10 +28,10 @@ export function CategoryModal({ isOpen, onClose, onSave, category, parentId, cat
 
   const getParentName = (id: string): string => {
     for (const cat of categories) {
-      if (cat.id === id) return cat.name;
-      if (cat.children) {
-        for (const child of cat.children) {
-          if (child.id === id) return child.name;
+      if (cat._id === id) return cat.name;
+      if (cat.subCategories) {
+        for (const child of cat.subCategories) {
+          if (child._id === id) return child.name;
         }
       }
     }
@@ -42,7 +42,7 @@ export function CategoryModal({ isOpen, onClose, onSave, category, parentId, cat
     if (category) {
       setFormData({
         name: category.name,
-        parentId: category.parentId,
+        parentId: category.parent,
       });
     } else {
       setFormData({

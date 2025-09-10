@@ -42,12 +42,12 @@ export function ProductModal({ isOpen, onClose, onSave, product, categories }: P
     const result: Array<{id: string, name: string}> = [];
     cats.forEach(cat => {
       const displayName = prefix ? `${prefix} > ${cat.name}` : cat.name;
-      if (cat.children && cat.children.length > 0) {
+      if (cat.subCategories && cat.subCategories.length > 0) {
         // Ajouter les sous-catégories seulement
-        result.push(...flattenCategories(cat.children, displayName));
+        result.push(...flattenCategories(cat.subCategories, displayName));
       } else if (prefix) {
         // C'est une sous-catégorie (a un prefix)
-        result.push({ id: cat.id, name: displayName });
+        result.push({ id: cat._id, name: displayName });
       }
     });
     return result;

@@ -1,8 +1,16 @@
-export interface Category {
-  id: string;
+export interface CategoryReq {
   name: string;
-  parentId?: string;
-  children?: Category[];
+  parent?: string;
+  
+}
+export interface Category {
+  _id?: string;
+  name: string;
+  slug?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  parent?: string;
+  subCategories?: Category[];
 }
 
 export interface Product {
@@ -40,39 +48,39 @@ export interface OrderItem {
 
 export const mockCategories: Category[] = [
   {
-    id: '1',
+    _id: '1',
     name: 'Visage',
-    children: [
-      { id: '1-1', name: 'Yeux', parentId: '1' },
-      { id: '1-2', name: 'Lèvres', parentId: '1' },
-      { id: '1-3', name: 'Crèmes hydratantes', parentId: '1' },
+    subCategories: [
+      { _id: '1-1', name: 'Yeux', parent: '1' },
+      { _id: '1-2', name: 'Lèvres', parent: '1' },
+      { _id: '1-3', name: 'Crèmes hydratantes', parent: '1' },
     ]
   },
   {
-    id: '2',
+    _id: '2',
     name: 'Corps',
-    children: [
-      { id: '2-1', name: 'Gels douche', parentId: '2' },
-      { id: '2-2', name: 'Crèmes corps', parentId: '2' },
-      { id: '2-3', name: 'Déodorants', parentId: '2' },
+    subCategories: [
+      { _id: '2-1', name: 'Gels douche', parent: '2' },
+      { _id: '2-2', name: 'Crèmes corps', parent: '2' },
+      { _id: '2-3', name: 'Déodorants', parent: '2' },
     ]
   },
   {
-    id: '3',
+    _id: '3',
     name: 'Cheveux',
-    children: [
-      { id: '3-1', name: 'Shampoings', parentId: '3' },
-      { id: '3-2', name: 'Après-shampoings', parentId: '3' },
-      { id: '3-3', name: 'Masques capillaires', parentId: '3' },
+    subCategories: [
+      { _id: '3-1', name: 'Shampoings', parent: '3' },
+      { _id: '3-2', name: 'Après-shampoings', parent: '3' },
+      { _id: '3-3', name: 'Masques capillaires', parent: '3' },
     ]
   },
   {
-    id: '4',
+    _id: '4',
     name: 'Santé',
-    children: [
-      { id: '4-1', name: 'Vitamines', parentId: '4' },
-      { id: '4-2', name: 'Premiers secours', parentId: '4' },
-      { id: '4-3', name: 'Thermomètres', parentId: '4' },
+    subCategories: [
+      { _id: '4-1', name: 'Vitamines', parent: '4' },
+      { _id: '4-2', name: 'Premiers secours', parent: '4' },
+      { _id: '4-3', name: 'Thermomètres', parent: '4' },
     ]
   }
 ];
